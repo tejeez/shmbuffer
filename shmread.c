@@ -15,20 +15,25 @@
 #define SHM_SIZE (DATASIZE*SHM_BUFSIZE + sizeof(size_t))
 
 
-int main() {
+int main(int argc, char *argv[]) {
 	void *shm_buf;
 	size_t nextp = 0, prevp = 0, *shm_p;
 	int shm_fd;
 
-	shm_fd = shm_open("/sdr-shm", O_RDONLY, 0644);
+	if(argc < 2) {
+		fprintf(stderr, "Usage: %s /name_of_shm\n", argv[0]);
+		return 1;
+	}
+
+	shm_fd = shm_open(argv[1], O_RDONLY, 0644);
 	if(shm_fd < 0) {
-		fprintf(stderr, "shm_open failed\n");
+		perror("shm_open failed");
 		return 1;
 	}
 
 	shm_buf = mmap(0, SHM_SIZE, PROT_READ, MAP_SHARED, shm_fd, 0);
 	if(shm_buf == MAP_FAILED) {
-		fprintf(stderr, "Map failed\n");
+		perror("Map failed");
 		return 1;
 	}
 	shm_p = shm_buf + DATASIZE*SHM_BUFSIZE;

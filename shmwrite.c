@@ -10,33 +10,41 @@
 // writing and reading the buffer always starts at byte aligned to DATASIZE
 #define DATASIZE 2
 
+// TODO: take the buffer size as command line argument
+
 // last sizeof(size_t) bytes of shm are an index to the element to be written next
 #define SHM_BUFSIZE 0x4000000ULL
 #define SHM_SIZE (DATASIZE*SHM_BUFSIZE + sizeof(size_t))
 
-int main() {
+int main(int argc, char *argv[]) {
 	void *shm_buf;
 	ssize_t r;
 	size_t p = 0, *shm_p;
 	size_t shm_bufsize_bytes;
 	int shm_fd;
 
+
+	if(argc < 2) {
+		fprintf(stderr, "Usage: %s /name_of_shm\n", argv[0]);
+		return 1;
+	}
+
 	shm_bufsize_bytes = DATASIZE * SHM_BUFSIZE;
 
-	shm_fd = shm_open("/sdr-shm", O_CREAT | O_RDWR, 0644);
+	shm_fd = shm_open(argv[1], O_CREAT | O_RDWR, 0644);
 	if(shm_fd < 0) {
-		fprintf(stderr, "shm_open failed\n");
+		perror("shm_open failed");
 		return 1;
 	}
 
 	if(ftruncate(shm_fd, SHM_SIZE) < 0) {
-		fprintf(stderr, "ftruncate failed\n");
+		perror("ftruncate failed");
 		return 1;
 	}
 
 	shm_buf = mmap(0, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
 	if(shm_buf == MAP_FAILED) {
-		fprintf(stderr, "Map failed\n");
+		perror("Map failed");
 		return 1;
 	}
 	shm_p = shm_buf + DATASIZE*SHM_BUFSIZE;
