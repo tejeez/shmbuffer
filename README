@@ -1,11 +1,25 @@
 Quick and dirty shared memory ring buffer written to speed up OpenWebRX
 by using this as an alternative to ncat.
 
+Use:
 shmwrite takes samples from stdin and writes them in a shared memory buffer.
 shmread reads samples from there and writes them in stdout.
 
 How it is actually used:
 https://github.com/tejeez/openwebrx/commit/35836c84519244162a5dac373bf410509c933bdb
+
+
+Why I wrote it:
+1) I found the CPU use of ncat became significant when I wrote an experimental,
+   faster DDC algorithm to use at high sampling rates.
+2) Using a big enough memory buffer and some additional logic in OpenWebRX,
+   it should be possible to allow listening to signals from a few seconds or
+   a few minutes ago. (Would someone like to implement such a feature in
+   OpenWebRX and its web UI?)
+3) There seems to be bug in ncat.
+   See https://github.com/simonyiszk/openwebrx/issues/42
+
+
 
 
 This is just a quick hack indeed:
