@@ -1,11 +1,13 @@
-Quick and dirty shared memory ring buffer written to speed up OpenWebRX
-by using this as an alternative to ncat.
+Quick and dirty shared memory ring buffer
+
+This was originally written to speed up OpenWebRX as an alternative to ncat
+but now this should be useful for other purposes too.
 
 Use:
 shmwrite takes samples from stdin and writes them in a shared memory buffer.
 shmread reads samples from there and writes them in stdout.
 
-How it is actually used:
+How it is actually used with OpenWebRX:
 https://github.com/tejeez/openwebrx/commit/35836c84519244162a5dac373bf410509c933bdb
 
 
@@ -23,8 +25,6 @@ Why I wrote it:
 
 
 This is just a quick hack indeed:
-Most of the parameters are just written in the C code instead of using command
-line arguments. This is quite easy to fix and I'll do it soon.
 There's no real synchronization: when new data isn't available, shmread just
 sleeps for 50 ms and checks again. This, however, seems to work well enough
 and I don't really know how to do it better.
@@ -39,9 +39,3 @@ a sign of the system running out of CPU resources. Such a situation could be
 handled simply by making shmread exit when it notices a buffer overflow,
 effectively kicking random OpenWebRX users out when the server is overloaded.
 I might try implement this if it seems necessary.
-
-
-
-Btw, fixbitorder_shmwrite.c is there because I originally tested this with my
-homebrew SDR receiver where I accidentally wired the bits of a parallel output
-ADC in wrong order and decided to fix it in software.
